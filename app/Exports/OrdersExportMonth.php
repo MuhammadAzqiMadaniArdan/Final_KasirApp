@@ -8,11 +8,13 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class OrdersExport implements FromCollection, WithHeadings, WithMapping
+class OrdersExportMonth implements FromCollection, WithHeadings, WithMapping
 {
     public function collection()
     {
-        return Order::with(['customer.member', 'order_details','order_details.product'])->get();
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+        return Order::with(['customer.member', 'order_details','order_details.product'])->whereBetween('created_at',[$startOfMonth,$endOfMonth])->get();
     }
 
     public function headings(): array

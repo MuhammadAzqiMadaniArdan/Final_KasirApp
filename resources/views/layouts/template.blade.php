@@ -60,7 +60,8 @@
                             <!-- Dark Logo icon -->
                             <img src="{{ asset('assets/images/logo-icon.png') }}" alt="homepage" class="dark-logo" />
                             <!-- Light Logo icon -->
-                            <img src="{{ asset('assets/images/logo-light-icon.png') }}" alt="homepage" class="light-logo" />
+                            <img src="{{ asset('assets/images/logo-light-icon.png') }}" alt="homepage"
+                                class="light-logo" />
                         </b>
                         <!--End Logo icon -->
                         <!-- Logo text -->
@@ -117,10 +118,11 @@
                                 aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="javascript:void(0)"><i class="ti-user m-r-5 m-l-5"></i>
                                 </a>
-                                <a class="dropdown-item" href="{{ route('logout') }}"><i class="mdi mdi-logout
+                                <a class="dropdown-item" href="{{ route('logout') }}"><i
+                                        class="mdi mdi-logout
                                     m-r-5 m-l-5"></i>
-                                                                Logout
-                                                            </a>
+                                    Logout
+                                </a>
                             </ul>
                         </li>
                         <!-- ============================================================== -->
@@ -143,21 +145,24 @@
                 <nav class="sidebar-nav">
                     <ul id="sidebarnav">
                         <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
-                                 aria-expanded="false" href={{ route('dashboard') }}><i
+                                aria-expanded="false" href={{ route('dashboard') }}><i
                                     class="mdi mdi-view-dashboard"></i><span class="hide-menu">Dashboard</span></a>
                         </li>
                         <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
-                                 aria-expanded="false"  href={{ route('product.index') }}><i
+                                aria-expanded="false" href={{ route('product.index') }}><i
                                     class="mdi mdi-store"></i><span class="hide-menu">Product</span></a></li>
                         <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
-                                aria-expanded="false"  href={{ route('order.index') }}><i
+                                aria-expanded="false" href={{ route('order.index') }}><i
                                     class="mdi mdi-cart"></i><span class="hide-menu">Pembelian</span></a></li>
-                        <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
-                               ia-expanded="false"  href={{ route('user.index') }}><i
-                                    class="mdi mdi-account-network
-        "></i><span class="hide-menu">User</span></a></li>
+                        @if (Auth::user()->role == 'Admin')
+                            <li class="sidebar-item"> <a class="sidebar-link waves-effect waves-dark sidebar-link"
+                                    ia-expanded="false" href={{ route('user.index') }}><i
+                                        class="mdi mdi-account-network
+                                        "></i><span
+                                        class="hide-menu">User</span></a></li>
+                        @endif
                     </ul>
-        
+
                 </nav>
             </div>
         </aside>
@@ -165,7 +170,7 @@
             @yield('content')
 
             <div class="container-fluid">
-                
+
             </div>
         </div>
     </div>

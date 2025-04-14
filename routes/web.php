@@ -64,11 +64,13 @@ Route::middleware('IsLogin')->group(function () {
 
     Route::prefix('/user')->name('user.')->group(function () {
         Route::get("/", [UserController::class, 'index'])->name('index');
-        Route::get("/download-pdf/{id}", [OrderController::class, 'downloadPdf'])->name('download.pdf');
-        Route::get("/excel/{id}", [OrderController::class, 'exportExcel'])->name('export.excel');
     });
 
     Route::prefix('/order')->name('order.')->group(function () {
         Route::get("/", [OrderController::class, 'index'])->name('index');
+        Route::get("/download-pdf/{id}", [OrderController::class, 'downloadPdf'])->name('download.pdf');
+        Route::get("/excel", [OrderController::class, 'exportExcel'])->name('export.excel');
+        Route::get("/excel/month", [OrderController::class, 'exportExcelMonthly'])->name('export.excel.month');
+        Route::get("/excel/year", [OrderController::class, 'exportExcelYear'])->name('export.excel.year');
     });
 });

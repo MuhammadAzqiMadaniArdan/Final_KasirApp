@@ -14,8 +14,7 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->enum('status',['member','non-member']);
-            $table->enum('status',['member','non-member']);
-            $table->integer('total_payment');
+            $table->bigInteger('total_payment');
             $table->timestamps();
         });
     }

@@ -2,28 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\OrdersExport;
+use App\Exports\OrdersExportMonth;
+use App\Exports\OrdersExportYear;
 use App\Models\Cart;
 use App\Models\Customer;
 use App\Models\Member;
 use App\Models\Order;
 use App\Models\Order_detail;
 use App\Models\Product;
+use Carbon\Carbon;
 use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Facades\Excel;
+use Excel;
 
 class OrderController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::orderBy('id','DESC')->paginate(10);
-        return view('order.index',compact('orders'));
+        $date = $request->input('date', 'daily');
+        $today = Carbon::today();
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+        $startOfYear = Carbon::now()->startOfYear();
+        $endOfYear = Carbon::now()->endOfYear();
+
+        if ($date == 'daily') {
+            $orders = Order::whereDate('created_at', $today)->orderBy('id', 'DESC')->paginate(10);
+        }elseif($date == 'monthly'){
+            $orders = Order::whereBetween('created_at', [$startOfMonth,$endOfMonth])->orderBy('id', 'DESC')->paginate(10);
+        }else{
+            $orders = Order::whereBetween('created_at', [$startOfYear,$endOfYear])->orderBy('id', 'DESC')->paginate(10);
+        }
+        return view('order.index', compact('orders','date'));
     }
 
     /**
@@ -76,8 +93,8 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(),[
-            "cost" => "required|numeric|min:0",
+        $validator = Validator::make($request->all(), [
+            "cost" => "required|numeric|min:0|max:99999999999999999999",
             "total_price" => "required|numeric|min:0",
             "phone_number" => "max:13",
             "status" => "required|string|in:member,non-member",
@@ -90,9 +107,10 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return redirect()->route('order.index')->with('failed', $validator->errors());
         }
-        
+
+
         $validated = $validator->validated();
-        
+
         // dd($validator->errors());
         DB::beginTransaction();
 
@@ -151,7 +169,7 @@ class OrderController extends Controller
                     "qty" => $product['qty'],
                 ]);
 
-                $myProduct = Product::where('id',$product['product_id'])->first();
+                $myProduct = Product::where('id', $product['product_id'])->first();
                 $myProduct['stock'] = $myProduct['stock'] - $product['qty'];
                 $myProduct->save();
             }
@@ -163,7 +181,7 @@ class OrderController extends Controller
             return redirect()->route('order.index')->with('failed', $e->getMessage());
         }
 
-        return redirect()->route('order.receipt',['id' => $order->id])->with('success','Berhasil Menambahkan Order');
+        return redirect()->route('order.receipt', ['id' => $order->id])->with('success', 'Berhasil Menambahkan Order');
     }
 
     /**
@@ -171,9 +189,9 @@ class OrderController extends Controller
      */
     public function receipt($id)
     {
-        $order = Order::where('id',$id)->first();
+        $order = Order::where('id', $id)->first();
         // dd($order);
-        return view('order.receipt',compact('order'));
+        return view('order.receipt', compact('order'));
     }
 
     /**
@@ -181,22 +199,33 @@ class OrderController extends Controller
      */
     public function downloadPdf($id)
     {
-        $order = Order::with('customer','customer.member','order_details.product','user')->findOrFail($id)->toArray();
+        $order = Order::with('customer', 'customer.member', 'order_details.product', 'user')->findOrFail($id)->toArray();
 
         // dd($order);
-        view()->share('order',$order);
+        view()->share('order', $order);
 
-        $pdf = PDF::loadView('order.download-pdf',$order);
+        $pdf = PDF::loadView('order.download-pdf', $order);
 
         return $pdf->download('receipt.pdf');
     }
 
-    public function exportExcel($id)
+    public function exportExcel()
     {
-        $file_name = "data pembelian ". ".xslx";
+        $file_name = "data pembelian" . ".xslx";
 
-        return redirect()->route('order.index');
-        // return Excel::download(new OrderExport );
+        return Excel::download(new OrdersExport, "pembelian.xlsx");
+    }
+    public function exportExcelMonthly()
+    {
+        $file_name = "data pembelian" . ".xslx";
+
+        return Excel::download(new OrdersExportMonth, "pembelian Bulanan.xlsx");
+    }
+    public function exportExcelYear()
+    {
+        $file_name = "data pembelian" . ".xslx";
+
+        return Excel::download(new OrdersExportYear, "pembelian Tahunan.xlsx");
     }
 
     /**

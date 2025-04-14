@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Order_detail;
 use App\Models\User;
+use ArielMejiaDev\LarapexCharts\LarapexChart;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -15,9 +17,33 @@ class UserController extends Controller
     public function dashboard()
     {
         $today = Carbon::today();
-        $ordersToday = Order::whereDate('created_at',$today)->count();
-        return view('dashboard',compact('ordersToday'));
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+    
+        $ordersToday = Order::whereDate('created_at', $today)->count();
+    
+        $ordersDay = Order_detail::whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->selectRaw('DATE(created_at) as date, SUM(qty) as total')
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->get();
+    
+        $date = $ordersDay->pluck('date')->toArray();
+        $total = $ordersDay->pluck('total')->toArray();
+    
+        $chart = (new LarapexChart)->setTitle('Produk')
+            ->setXAxis($date)
+            ->setDataset([
+                [
+                    "name" => "Produk",
+                    "data" => $total,
+                ]
+            ])
+            ->setColors(['#FF5733']); // Sesuaikan warna
+    
+        return view('dashboard', compact('ordersToday', 'chart'));
     }
+    
 
     public function index()
     {

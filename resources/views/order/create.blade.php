@@ -70,7 +70,7 @@
                             <div class="mb-3">
                                 <label for="cost" class="form-label">Total Bayar</label>
                                 <input type="number" name="cost" id="cost" class="form-control" value=""
-                                    min="totalHarga" onchange="totalHarga()">
+                                    min="{{ $totalPrice }}" max="99999999999999999999"  onchange="totalHarga()" maxlength="11">
                                 <span id="alert-cost" class="text-danger small" style="display:none;">Jumlah bayar
                                     kurang</span>
                             </div>
