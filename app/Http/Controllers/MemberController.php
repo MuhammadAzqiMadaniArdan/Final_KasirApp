@@ -21,8 +21,9 @@ class MemberController extends Controller
     public function index($id)
     {
         $member = Member::where('id',$id)->first();
+        $customer = Customer::where('id',$member['customer_id'])->first();
         $carts = Cart::where('user_id',Auth::user()->id)->get();
-        return view('order.member',compact('member','carts'));
+        return view('order.member',compact('member','carts','customer'));
     }
 
     /**
@@ -44,7 +45,6 @@ class MemberController extends Controller
             "total_price" => "required|numeric|min:0",
             "points_used" => "numeric",
             "points_checked" => "numeric",
-            "status" => "required|string|in:old,new",
             "products" => "required|array",
             "products.*.product_id" => "required|exists:products,id",
             "products.*.qty" => "required|min:0",
@@ -60,7 +60,7 @@ class MemberController extends Controller
         DB::beginTransaction();
         try{
             $member = Member::where('id',$id)->first();
-            $customer = Customer::where('id',$member['customer_id'])->get();
+            $customer = Customer::where('id',$member['customer_id'])->first();
 
             $pointsUsed = 0;
             
@@ -68,43 +68,48 @@ class MemberController extends Controller
             {
                 $member->status = "old";
             }
-
             if($validated['points_checked'] == true){
                 $pointsUsed = $member->points;
                 $member->points = 0;
             }
-
-            $member->save();
-
+            
+            $member->name = $validated['name'];
+            
+            
             $order = Order::create([
                 "customer_id" => $customer['id'],
                 "user_id" => Auth::user()->id,
-                "invoice" => null,
+                "invoice" => 0,
                 "total_price" => $validated['total_price'],
                 "cost" => $validated['cost'],
-                "point_used" => $pointsUsed,
+                "points_used" => $pointsUsed,
             ]);
-
+            
             $order->invoice = $order['id'];
             $order->save();
-
+            
             foreach ($validated['products'] as $product) {
                 Order_detail::create([
                     "order_id" => $order['id'],
                     "product_id" => $product['product_id'],
                     "qty" => $product['qty'],
                 ]);
-
-                Product::where('id',$product['id'])->decrement($product['qty']);
+                
+                $myProduct = Product::where('id',$product['product_id'])->first();
+                $myProduct['stock'] = $myProduct['stock'] - $product['qty'];
+                $myProduct->save();
             }
-
+            
+            $member->save();
             DB::commit();
+            // dd("halo",$member['customer_id'],$customer->id);
         }
         catch(\Exception $e){
             DB::rollBack();
+            dd($e->getMessage());
             return redirect()->back()->with('failed', $e->getMessage());
         }
-
+        
         
         return redirect()->route('order.receipt',['id' => $order->id])->with('success','Berhasil Menambahkan Order');
     }

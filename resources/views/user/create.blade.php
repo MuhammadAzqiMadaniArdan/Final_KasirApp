@@ -19,7 +19,7 @@
         </div>
     @endif
 
-    <form action="" method="POST">
+    <form action="{{ route('user.store') }}" method="POST">
         @csrf
         <div class="mb-3">
             <label for="name" class="form-label">Nama Lengkap</label>
@@ -39,7 +39,7 @@
         <div class="mb-3">
             <label for="role" class="form-label">Peran (Role)</label>
             <select class="form-select" id="role" name="role" required>
-                <option value="" selected disabled>Pilih peran</option>
+                <option value="" selected disabled hidden>Pilih peran</option>
                 <option value="Admin">Admin</option>
                 <option value="Employee">Employee</option>
             </select>

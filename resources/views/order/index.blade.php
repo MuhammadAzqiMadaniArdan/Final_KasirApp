@@ -39,6 +39,7 @@
                                 <th scope="col">Nama Customer</th>
                                 <th scope="col">Tanggal Penjualan</th>
                                 <th scope="col">Total Harga</th>
+                                <th scope="col">Petugas</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -55,13 +56,14 @@
                                     <td>{{ $isMember == true ? $item->customer->member->name : "Bukan Member" }}</td>
                                     <td>{{ \Carbon\Carbon::parse($item->created_at)->format('d F Y') }}</td>
                                     <td>{{ $item->total_price - $item->points_used }}</td>
+                                    <td>{{ $item->user->name}}</td>
                                     <td>
                                         <ul>
                                             <div class="m-r-10">
                                                 <a class="btn btn-info text-white" href="">Lihat</a>
                                             </div>
                                             <div class="m-r-10">
-                                                <a class="btn btn-info text-white" href="">Download PDF</a>
+                                                <a class="btn btn-info text-white" href="{{ route('order.download.pdf',$item->id) }}">Download PDF</a>
                                             </div>
                                         </ul>
                                     </td>

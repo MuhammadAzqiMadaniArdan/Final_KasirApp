@@ -13,6 +13,7 @@ class Order extends Model
         'user_id',
         'customer_id',
         'invoice',
+        'points_used',
         'cost',
         'total_price',
     ];

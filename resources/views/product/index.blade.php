@@ -6,8 +6,7 @@
             <div class="col-6">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 d-flex align-items-center">
-                        <li class="breadcrumb-item"><a class="link"><i
-                                    class="mdi mdi-home-outline fs-4"></i></a></li>
+                        <li class="breadcrumb-item"><a class="link"><i class="mdi mdi-home-outline fs-4"></i></a></li>
                         <li class="breadcrumb-item active" aria-current="page">Product</li>
                     </ol>
                 </nav>
@@ -15,7 +14,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row p-30">
         <div class="col-12">
             <div class="card">
@@ -23,7 +22,8 @@
                     <div class="d-md-flex">
                         <div class="ms-auto">
                             <div class="dl">
-                                <div class="m-r-10"><a class="btn d-flex btn-info text-white" href="{{route('product.create')}}">Tambah Produk</a>
+                                <div class="m-r-10"><a class="btn d-flex btn-info text-white"
+                                        href="{{ route('product.create') }}">Tambah Produk</a>
                                 </div>
                             </div>
                         </div>
@@ -46,20 +46,57 @@
                                 $no = 1;
                             @endphp
                             @foreach ($products as $item)
-                                
                                 <tr>
                                     <th scope="row">{{ $no++ }}</th>
-                                    <td><img src="{{ asset('storage/'.$item->image) }}" alt="{{ $item->name }}"
+                                    <td><img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}"
                                             width="100"></td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->price }}</td>
                                     <td>{{ $item->stock }}</td>
                                     <td>
-                                        <ul>
+                                        <ul class="d-flex justify-content-between">
                                             <div class="m-r-10">
-                                                <a class="btn btn-info text-white" href="{{ route('product.edit',$item->id) }}">Edit</a>
+                                                <a class="btn btn-info text-white"
+                                                    href="{{ route('product.edit', $item->id) }}">Edit</a>
                                             </div>
-                                            <form action="{{ route('product.delete',$item->id) }}" method="POST">
+                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                data-bs-target="#orderModal{{ $item->id }}">
+                                                Update Stock
+                                            </button>
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="orderModal{{ $item->id }}" tabindex="-1"
+                                                aria-labelledby="orderModal{{ $item->id }}Label" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title"
+                                                                id="orderModal{{ $item->id }}Label">Modal title</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                        </div>
+                                                        <form action="{{ route('product.updateStock', $item->id) }}" method="POST" class="container mt-5">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <div class="mb-3">
+                                                                <label for="name" class="form-label">Nama </label>
+                                                                <input type="text" class="form-control" id="name" name="name" value="{{ $item->name }}" disabled>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="name" class="form-label">Stock </label>
+                                                                <input type="number" class="form-control" id="stock" name="stock" value="{{ $item->stock }}" value="{{ $item->stock }}" min="0">
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">Close</button>
+                                                                <button type="submit" class="btn btn-primary">Save
+                                                                    changes</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <form action="{{ route('product.delete', $item->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-warning">Delete</button>
@@ -67,7 +104,6 @@
                                         </ul>
                                     </td>
                                 </tr>
-                                
                             @endforeach
                         </tbody>
                     </table>

@@ -19,25 +19,37 @@
         <div class="col-12">
             <form action="{{ route('order.cart.post') }}" method="POST">
                 @csrf
-                @foreach ($products as $index => $item)
-                    <div class="product card">
-                        <img src="{{ asset('storage/'.$item->image ) }}" alt="{{ $item->name }}" width="100">
-                        <div class="card-body">
-                            <h3>{{ $item->name }}</h3>
-                            <p class="price" data-raw="{{ $item->price }}">{{ $item->price }}</p>
-                            <p>{{ $item->stock }}</p>
-                            <p>{{ $item->stock }}</p>
-                            <div class="d-md-flex">
-                                <button type="button" class="btn-minus">-</button>
-                                <input type="number" name="qty[{{ $index }}]" class="qty" value="{{ $item->qty }}" min="0" max="{{ $item->stock }}">
-                                <button type="button" class="btn-plus">+</button>
+                <div style="display: flex;gap:10px;">
+
+                    @foreach ($products as $index => $item)
+                        <div class="product card" style="width: 30%">
+                            <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" width="100">
+                            <div class="card-body">
+                                <h3>{{ $item->name }}</h3>
+                                <p class="price" data-raw="{{ $item->price }}">Rp.
+                                    {{ number_format($item->price, 0, ',', '.') }}</p>
+                                <p>{{ $item->stock }}</p>
+                                <div class="d-md-flex">
+                                    <div class="m-r-10">
+                                        <button class="btn-minus btn btn-info text-white" type="button">-</buttom>
+                                    </div> <input type="number" name="qty[{{ $index }}]" class="qty"
+                                        value="{{ $item->qty == 0 ? '0' : '' }}" min="0" max="{{ $item->stock }}">
+                                    <div class="m-r-10">
+                                        <button class="btn-plus btn btn-info text-white" type="button" >+</buttom>
+                                    </div> 
+                                    {{-- <input type="number" name="qty[{{ $index }}]" class="qty"
+                                        value="{{ $item->qty == 0 ? '0' : '' }}" min="0" max="{{ $item->stock }}">
+                                    <button type="button" class="btn-plus">+</button> --}}
+                                </div>
+                                <h2>Total <span class="total">Rp. 0</span></h2>
+                                <input type="hidden" name="id[{{ $index }}]" value="{{ $item->id }}">
+                                <input type="hidden" name="stock[{{ $index }}]" value="{{ $item->stock }}"
+                                    class="stock">
                             </div>
-                            <h2>Total Rp. <span class="total">0</span></h2>
-                            <input type="hidden" name="id[{{ $index }}]" value="{{ $item->id }}">
-                            <input type="hidden" name="stock[{{ $index }}]" value="{{ $item->stock }}" class="stock">
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
+
                 <button type="submit">
                     checkout
                 </button>
@@ -46,45 +58,46 @@
 
     </div>
     @push('script')
-    <script>
-        document.addEventListener('DOMContentLoaded',function() {
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
 
-            const updateTotal = (productCard) => {
-                const price = parseInt(productCard.querySelector(".price").dataset.raw);
-                const qty = parseInt(productCard.querySelector(".qty").value);
-                const totalSpan = productCard.querySelector(".total");
-                const total = price * qty;
-                totalSpan.textContent = total;
-            }
+                const updateTotal = (productCard) => {
+                    const price = parseInt(productCard.querySelector(".price").dataset.raw);
+                    const qty = parseInt(productCard.querySelector(".qty").value);
+                    const totalSpan = productCard.querySelector(".total");
+                    const total = price * qty;
+                    totalSpan.textContent = total;
+                    console.log(qty)
+                }
 
-            document.querySelectorAll('.product').forEach(productCard => {
-                const btnPlus = productCard.querySelector('.btn-plus');
-                const btnMinus = productCard.querySelector('.btn-minus');
-                const qtyInput = productCard.querySelector('.qty');
-                const stock = parseInt(productCard.querySelector('.stock').value);
+                document.querySelectorAll('.product').forEach(productCard => {
+                    const btnPlus = productCard.querySelector('.btn-plus');
+                    const btnMinus = productCard.querySelector('.btn-minus');
+                    const qtyInput = productCard.querySelector('.qty');
+                    const stock = parseInt(productCard.querySelector('.stock').value);
 
-                btnPlus.addEventListener('click', () => {
-                    let currentQty = parseInt(qtyInput.value) || 0;
-                    if(currentQty < stock){
-                        qtyInput.value = currentQty + 1;
-                        updateTotal(productCard);
-                    }else{
-                        alert('stock Habis');
-                    }
-                })
+                    btnPlus.addEventListener('click', () => {
+                        let currentQty = parseInt(qtyInput.value) || 0;
+                        if (currentQty < stock) {
+                            qtyInput.value = currentQty + 1;
+                            updateTotal(productCard);
+                        } else {
+                            alert('stock Habis');
+                        }
+                    })
 
-                btnMinus.addEventListener('click', () => {
-                    let currentQty = parseInt(qtyInput.value) || 0;
-                    if(currentQty > 0){
-                        qtyInput.value = currentQty - 1;
-                        updateTotal(productCard);
-                    }
+                    btnMinus.addEventListener('click', () => {
+                        let currentQty = parseInt(qtyInput.value) || 0;
+                        if (currentQty > 0) {
+                            qtyInput.value = currentQty - 1;
+                            updateTotal(productCard);
+                        }
+                    });
+
+                    updateTotal(productCard);
+
                 });
-
-                updateTotal(productCard);
-
-            });
-        })
-    </script>
+            })
+        </script>
     @endpush
 @endsection

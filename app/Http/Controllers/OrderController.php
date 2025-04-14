@@ -50,8 +50,9 @@ class OrderController extends Controller
         $carts = Cart::where('user_id', Auth::user()->id)->get();
 
         if ($carts->count() > 0) {
-
-            $carts->delete();
+            foreach ($carts as $cart) {
+                $cart->delete();
+            }
         }
 
         try {
@@ -78,7 +79,7 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(),[
             "cost" => "required|numeric|min:0",
             "total_price" => "required|numeric|min:0",
-            "phone_number" => "max:13|unique:members,phone_number",
+            "phone_number" => "max:13",
             "status" => "required|string|in:member,non-member",
             "products" => "required|array",
             "products.*.product_id" => "required|exists:products,id",
@@ -182,7 +183,8 @@ class OrderController extends Controller
     {
         $order = Order::with('customer','customer.member','order_details.product','user')->findOrFail($id)->toArray();
 
-        view()->share($order,'order');
+        // dd($order);
+        view()->share('order',$order);
 
         $pdf = PDF::loadView('order.download-pdf',$order);
 

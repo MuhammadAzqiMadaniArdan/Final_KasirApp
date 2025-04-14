@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -11,14 +14,16 @@ class UserController extends Controller
     //
     public function dashboard()
     {
-        return view('dashboard');
+        $today = Carbon::today();
+        $ordersToday = Order::whereDate('created_at',$today)->count();
+        return view('dashboard',compact('ordersToday'));
     }
 
     public function index()
     {
-        $orders = Order::orderBy('id', 'DESC')->get();
+        $users = User::orderBy('id', 'DESC')->get();
 
-        return view('order.index', compact('orders'));
+        return view('user.index', compact('users'));
     }
 
     /**
@@ -26,7 +31,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('order.create');
+        return view('user.create');
     }
 
     /**
@@ -42,28 +47,28 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('order.index')->with('failed', $validator->errors());
+            return redirect()->route('user.index')->with('failed', $validator->errors());
         }
 
 
         $validated = $validator->validated();
 
-        $path = $request->file('image')->store('orders', 'public');
-        $validated['image'] = $path;
+        $password = Hash::make($request->password);
+        $validated['password'] = $password;
 
         try {
-            Order::create($validated);
+            User::create($validated);
         } catch (\Exception $e) {
-            return redirect()->route('order.index')->with('failed', $e->getMessage());
+            return redirect()->route('user.index')->with('failed', $e->getMessage());
         }
 
-        return redirect()->route('order.index')->with('success', 'Berhasil Menambahkan Produk');
+        return redirect()->route('user.index')->with('success', 'Berhasil Menambahkan Produk');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Order $order)
+    public function show(User $user)
     {
         //
     }
@@ -73,8 +78,8 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $order = Order::findOrFail($id);
-        return view('order.edit',compact('order'));
+        $user = User::findOrFail($id);
+        return view('user.edit',compact('user'));
     }
 
     /**
@@ -84,29 +89,33 @@ class UserController extends Controller
     {
         $validator = Validator::make($request->all(), [
             "name" => "string|max:255",
-            "price" => "integer|min:0",
-            "stock" => "integer|min:0",
-            "image" => "nullable|image|mimes:jpg,png,jpeg,gif,svg|max:2048"
+            "email" => "email:dns|max:255",
+            "role" => "string|in:Admin,Employee",
+            "password" => "",
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('order.index')->with('failed', $validator->errors());
+            return redirect()->route('user.index')->with('failed', $validator->errors());
         }
 
         $validated = $validator->validated();
-        if (isset($validated['image'])) {
-            $path = $request->file('image')->store('orders', 'public');
-            $validated['image'] = $path;
+        $user = User::findOrFail($id);
+        if ($validated['password'] == null) {
+            $password = $user['password'];
+            $validated['password'] = $password;
+        }else{
+            $password = Hash::make($request->password);
+            $validated['password'] = $password;
         }
 
         try {
-            $order = Order::findOrFail($id);
-            $order->update($validated);
+            $user->update($validated);
         } catch (\Exception $e) {
-            return redirect()->route('order.index')->with('failed', $e->getMessage());
+            dd($e->getMessage());
+            return redirect()->route('user.index')->with('failed', $e->getMessage());
         }
 
-        return redirect()->route('order.index')->with('success', 'Berhasil Mengupdate Produk');
+        return redirect()->route('user.index')->with('success', 'Berhasil Mengupdate Produk');
     }
 
     /**
@@ -114,9 +123,9 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $order = Order::findOrFail($id);
-        $order->delete();
+        $user = User::findOrFail($id);
+        $user->delete();
 
-        return redirect()->route('order.index')->with('success', 'Berhasil Menghapus Produk');
+        return redirect()->route('user.index')->with('success', 'Berhasil Menghapus Produk');
     }
 }

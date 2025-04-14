@@ -34,15 +34,16 @@
   </style>
 </head>
 @php
-$isMember = $order->customer->member == "member" ? true : false;
+$isMember = $order['customer']['status'] == "member" ? true : false;
+;
 @endphp
 <body>
 <div class="receipt-box">
   <h5 class="fw-bold">Indo April</h5>
-  <p class="mb-1">Member Status :  </p>
-  <p class="mb-1">No. HP : 081111111111</p>
-  <p class="mb-1">Bergabung Sejak : 08 February 2025</p>
-  <p class="mb-3">Poin Member : 120000</p>
+  <p class="mb-1">Member Status :  {{ $isMember ?  $order['customer']['member']['name'] : '-'}}</p>
+  <p class="mb-1">No. HP : {{ $isMember ?  $order['customer']['member']['phone_number'] : '-'}}</p>
+  <p class="mb-1">Bergabung Sejak : {{ $isMember ? \Carbon\Carbon::parse($order['customer']['member']['created_at'])->format('d F Y') : "-"}}</p>
+  <p class="mb-3">Poin Member : {{ $isMember ? $order['customer']['member']['points'] : "-"}}</p>
 
   <table class="table">
     <thead>
@@ -54,12 +55,21 @@ $isMember = $order->customer->member == "member" ? true : false;
       </tr>
     </thead>
     <tbody>
+      @php
+      $totalPrice = 0;
+    @endphp
+      @foreach ($order['order_details'] as $item)
+      @php
+      $subPrice = $item['product']['price'] * $item['qty'];
+        $totalPrice += $subPrice;
+      @endphp
       <tr>
-        <td>TV</td>
-        <td>2</td>
-        <td>Rp. 6.000.000</td>
-        <td>Rp. 12.000.000</td>
+        <td>{{ $item['product']['name'] }}</td>
+        <td>Rp. {{ number_format($item['product']['price'],0,',','.') }}</td>
+        <td>{{ $item['qty'] }}</td>
+        <td>Rp. {{ number_format($subPrice,0,',','.') }}</td>
       </tr>
+      @endforeach
     </tbody>
   </table>
 
@@ -67,25 +77,25 @@ $isMember = $order->customer->member == "member" ? true : false;
     <tbody>
       <tr>
         <td class="fw-bold">Total Harga</td>
-        <td class="fw-bold text-end">Rp. 12.000.000</td>
+        <td class="fw-bold text-end">Rp. {{ $totalPrice }}</td>
       </tr>
       <tr>
         <td>Poin Digunakan</td>
-        <td class="text-end">0</td>
+        <td class="text-end">{{ $order['points_used'] }}</td>
       </tr>
       <tr>
         <td>Harga Setelah Poin</td>
-        <td class="text-end">Rp. 0</td>
+        <td class="text-end">Rp. {{ $totalPrice - $order['points_used'] }}</td>
       </tr>
       <tr>
         <td>Total Kembalian</td>
-        <td class="text-end">Rp. 0</td>
+        <td class="text-end">Rp. {{ $order['cost'] -  ($totalPrice - $order['points_used']) }}</td>
       </tr>
     </tbody>
   </table>
 
   <div class="footer-text text-center">
-    2025-02-08T05:59:57.000000Z | Petugas
+    {{ $order['created_at'] }} | {{ $order['user']['name'] }}
   </div>
   <div class="thanks text-muted">
     Terima kasih atas pembelian Anda!

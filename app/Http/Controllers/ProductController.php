@@ -106,6 +106,28 @@ class ProductController extends Controller
         return redirect()->route('product.index')->with('success', 'Berhasil Mengupdate Produk');
     }
 
+    public function updateStock(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            "stock" => "integer|min:0",
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('product.index')->with('failed', $validator->errors());
+        }
+
+        $validated = $validator->validated();
+
+        try {
+            $product = Product::findOrFail($id);
+            $product->update($validated);
+        } catch (\Exception $e) {
+            return redirect()->route('product.index')->with('failed', $e->getMessage());
+        }
+
+        return redirect()->route('product.index')->with('success', 'Berhasil Mengupdate Produk');
+    }
+
     /**
      * Remove the specified resource from storage.
      */

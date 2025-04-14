@@ -4,18 +4,18 @@
 <div class="container mt-5">
     <h2>Edit User</h2>
 
-    <form action="" method="POST">
-
+    <form action="{{ route('user.update',$user['id']) }}" method="POST">
+        @method('PATCH')
         @csrf
 
         <div class="mb-3">
             <label for="name" class="form-label">Nama Lengkap</label>
-            <input type="text" class="form-control" id="name" name="name" value="" required>
+            <input type="text" class="form-control" id="name" name="name" value="{{ $user->name }}" required>
         </div>
 
         <div class="mb-3">
             <label for="email" class="form-label">Alamat Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="" required>
+            <input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}" required>
         </div>
 
         <div class="mb-3">
@@ -26,8 +26,8 @@
         <div class="mb-3">
             <label for="role" class="form-label">Peran (Role)</label>
             <select class="form-select" id="role" name="role" required>
-                <option value="Admin" >Admin</option>
-                <option value="Employee">Employee</option>
+                <option value="Admin" {{ $user->role == "Admin" ? 'selected' : '' }}>Admin</option>
+                <option value="Employee" {{ $user->role == "Employee" ? 'selected' : '' }}>Employee</option>
             </select>
         </div>
 

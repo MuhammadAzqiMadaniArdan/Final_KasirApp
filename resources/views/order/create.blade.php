@@ -20,7 +20,8 @@
                             @endphp
                             @foreach ($carts as $item)
                                 @php
-                                    $totalPrice = $item->product->price * $item->qty;
+                                $subTotal = $item->product->price * $item->qty;
+                                    $totalPrice += $subTotal;
                                 @endphp
                                 <div class="d-flex justify-content-between mb-2">
                                     <div>

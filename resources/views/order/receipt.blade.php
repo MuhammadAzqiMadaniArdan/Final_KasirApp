@@ -9,7 +9,7 @@
       </div>
 
       @php
-        $isMember = $order->customer->member == "member" ? true : false;
+        $isMember = $order->customer['status'] == "member" ? true : false;
         @endphp
       <!-- Info -->
       <div class="d-flex justify-content-between mb-4">
@@ -58,7 +58,7 @@
       <div class="row rounded-3 py-3 px-2" style="background-color: #f1f3f5;">
           <div class="col-md-3">
               <p class="text-muted mb-0" style="font-size: 0.8rem;">POIN DIGUNAKAN</p>
-              <p class="mb-0">{{ $order->point_used }}</p>
+              <p class="mb-0">{{ $order->points_used }}</p>
           </div>
           <div class="col-md-3">
               <p class="text-muted mb-0" style="font-size: 0.8rem;">KASIR</p>
@@ -70,7 +70,13 @@
           </div>
           <div class="col-md-3 d-flex flex-column justify-content-center align-items-center p-3 rounded-3" style="background-color: #212529; color: white;">
               <span style="font-size: 0.8rem; text-transform: uppercase;">Total</span>
-              <strong style="font-size: 1.25rem;">Rp. {{ number_format($totalPrice - $order->point_used,0,',','.') }}</strong>
+              @php
+               $pointsUsed = $order->points_used == 0 ? false : true;
+              @endphp
+              @if($pointsUsed == true)
+              <strong style="font-size: 1.25rem;">Rp. <s>{{ number_format($totalPrice,0,',','.') }}</s></strong>
+              @endif
+              <strong style="font-size: 1.25rem;">Rp. {{ number_format($totalPrice - $order->points_used,0,',','.') }}</strong>
           </div>
       </div>
   </div>
