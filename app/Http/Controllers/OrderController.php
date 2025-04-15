@@ -26,21 +26,40 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
+        $limit = $request->input('limit', 10);
         $date = $request->input('date', 'daily');
+        $month = $request->input('month', 1);
+        $year = $request->input('year', now()->year);
         $today = Carbon::today();
-        $startOfMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = Carbon::now()->endOfMonth();
-        $startOfYear = Carbon::now()->startOfYear();
-        $endOfYear = Carbon::now()->endOfYear();
-
+        $startOfMonth = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+        $endOfMonth = Carbon::createFromDate($year, $month, 31)->endOfMonth();
+        $startOfYear = Carbon::createFromDate($year, 1, 1)->startOfYear();
+        $endOfYear = Carbon::createFromDate($year, 12, 31)->endOfYear();
+        
+        $months = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember',
+        ];
+        // $monthy = Carbon::create()->month(1);
+        // dd(Order::whereBetween('created_at',)->get(),now()->year,$year);
         if ($date == 'daily') {
-            $orders = Order::whereDate('created_at', $today)->orderBy('id', 'DESC')->paginate(10);
+            $orders = Order::whereDate('created_at', $today)->orderBy('id', 'DESC')->paginate($limit);
         }elseif($date == 'monthly'){
-            $orders = Order::whereBetween('created_at', [$startOfMonth,$endOfMonth])->orderBy('id', 'DESC')->paginate(10);
+            $orders = Order::whereBetween('created_at', [$startOfMonth,$endOfMonth])->WhereBetween('created_at',[$startOfYear,$endOfYear])->orderBy('id', 'DESC')->paginate($limit);
         }else{
-            $orders = Order::whereBetween('created_at', [$startOfYear,$endOfYear])->orderBy('id', 'DESC')->paginate(10);
+            $orders = Order::whereBetween('created_at', [$startOfYear,$endOfYear])->orderBy('id', 'DESC')->paginate($limit);
         }
-        return view('order.index', compact('orders','date'));
+        return view('order.index', compact('orders','date','months','year','month','limit'));
     }
 
     /**
@@ -209,18 +228,29 @@ class OrderController extends Controller
         return $pdf->download('receipt.pdf');
     }
 
-    public function exportExcel()
+    public function exportExcel(Request $request)
     {
-        $file_name = "data pembelian" . ".xslx";
-
-        return Excel::download(new OrdersExport, "pembelian.xlsx");
+        $type = $request->type;    // 'daily', 'monthly', 'yearly'
+        $month = $request->month;  // 1-12 atau null
+        $year = $request->year;    // misal 2024
+    
+        return Excel::download(
+            new OrdersExport($type, $month, $year),
+            "Laporan-Penjualan.xlsx"
+        );
     }
-    public function exportExcelMonthly()
+    
+    public function exportExcelMonthly(Request $request)
     {
-        $file_name = "data pembelian" . ".xslx";
-
-        return Excel::download(new OrdersExportMonth, "pembelian Bulanan.xlsx");
+        $month = $request->month;
+        $year = $request->year;
+    
+        return Excel::download(
+            new OrdersExportMonth($month, $year),
+            "pembelian-bulanan-{$month}-{$year}.xlsx"
+        );
     }
+    
     public function exportExcelYear()
     {
         $file_name = "data pembelian" . ".xslx";

@@ -3,7 +3,16 @@
 @section('content')
 <div class="container mt-5">
     <h2>Edit User</h2>
-
+    @if(Session::get('success'))
+    <div class="" style="padding-right: 30px;padding-left: 30px;padding-top: 20px;padding-bottom: 20px;">
+        <p class="btn btn-primary" style="width: 100%;">{{Session::get('success')}}</p>
+    </div>
+    @endif
+    @if(Session::get('failed'))
+    <div class="" style="padding-right: 30px;padding-left: 30px;padding-top: 20px;padding-bottom: 20px;">
+        <p class="btn btn-warning" style="width: 100%;">{{Session::get('failed')}}</p>
+    </div>
+    @endif
     <form action="{{ route('user.update',$user['id']) }}" method="POST">
         @method('PATCH')
         @csrf

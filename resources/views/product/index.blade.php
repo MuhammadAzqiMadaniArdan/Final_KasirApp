@@ -14,18 +14,29 @@
             </div>
         </div>
     </div>
-
+    @if(Session::get('success'))
+    <div class="" style="padding-right: 30px;padding-left: 30px;padding-top: 20px;padding-bottom: 20px;">
+        <p class="btn btn-primary" style="width: 100%;">{{Session::get('success')}}</p>
+    </div>
+    @endif
+    @if(Session::get('failed'))
+    <div class="" style="padding-right: 30px;padding-left: 30px;padding-top: 20px;padding-bottom: 20px;">
+        <p class="btn btn-warning" style="width: 100%;">{{Session::get('failed')}}</p>
+    </div>
+    @endif
     <div class="row p-30">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
                     <div class="d-md-flex">
                         <div class="ms-auto">
+                            @if(Auth::user()->role == "Admin")
                             <div class="dl">
                                 <div class="m-r-10"><a class="btn d-flex btn-info text-white"
                                         href="{{ route('product.create') }}">Tambah Produk</a>
                                 </div>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -38,7 +49,9 @@
                                 <th scope="col">Nama Produk</th>
                                 <th scope="col">Harga</th>
                                 <th scope="col">Stok</th>
+                                @if(Auth::user()->role == "Admin")
                                 <th scope="col"></th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -53,6 +66,7 @@
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->price }}</td>
                                     <td>{{ $item->stock }}</td>
+                                    @if(Auth::user()->role == "Admin")
                                     <td>
                                         <ul class="d-flex justify-content-between">
                                             <div class="m-r-10">
@@ -75,16 +89,20 @@
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                         </div>
-                                                        <form action="{{ route('product.updateStock', $item->id) }}" method="POST" class="container mt-5">
+                                                        <form action="{{ route('product.updateStock', $item->id) }}"
+                                                            method="POST" class="container mt-3">
                                                             @csrf
                                                             @method('PATCH')
                                                             <div class="mb-3">
                                                                 <label for="name" class="form-label">Nama </label>
-                                                                <input type="text" class="form-control" id="name" name="name" value="{{ $item->name }}" disabled>
+                                                                <input type="text" class="form-control" id="name"
+                                                                    name="name" value="{{ $item->name }}" disabled>
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="name" class="form-label">Stock </label>
-                                                                <input type="number" class="form-control" id="stock" name="stock" value="{{ $item->stock }}" value="{{ $item->stock }}" min="0">
+                                                                <input type="number" class="form-control" id="stock"
+                                                                    name="stock" value="{{ $item->stock }}"
+                                                                    value="{{ $item->stock }}" min="0">
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"
@@ -103,6 +121,7 @@
                                             </form>
                                         </ul>
                                     </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>

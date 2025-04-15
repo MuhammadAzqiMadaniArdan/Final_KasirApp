@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Exports;
 
 use App\Models\Order;
@@ -10,16 +11,26 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class OrdersExportMonth implements FromCollection, WithHeadings, WithMapping
 {
+    protected $month;
+    protected $year;
+
+    public function __construct($month, $year)
+    {
+        $this->month = $month;
+        $this->year = $year;
+    }
+
     public function collection()
     {
-        $startOfMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = Carbon::now()->endOfMonth();
-        return Order::with(['customer.member', 'order_details','order_details.product'])->whereBetween('created_at',[$startOfMonth,$endOfMonth])->get();
+        return Order::with(['customer.member', 'order_details', 'order_details.product'])
+            ->whereMonth('created_at', $this->month)
+            ->whereYear('created_at', $this->year)
+            ->get();
     }
 
     public function headings(): array
     {
-        return ['Nama', 'No telp','Produk','tanggal_penjualan', 'Points','Total Bayar', 'Total Price','Points yang kepake','penanggung jawab'];
+        return ['Nama', 'No telp', 'Produk', 'tanggal_penjualan', 'Points', 'Total Bayar', 'Total Price', 'Points yang kepake', 'penanggung jawab'];
     }
 
     public function map($order): array
@@ -30,9 +41,9 @@ class OrdersExportMonth implements FromCollection, WithHeadings, WithMapping
         $points = $isMember ? $order->customer->member->points : "-";
         $products = $order->order_details->map(function ($item) {
             return $item->product->name . " (qty: " . $item->qty . ")";
-        })->implode(', '); 
+        })->implode(', ');
         $user = $order->user->name;
-        
+
         return [
             $name,
             $phoneNumber,

@@ -47,6 +47,10 @@ Route::middleware('IsLogin')->group(function () {
             Route::patch("/updateStock/{id}", [ProductController::class, 'updateStock'])->name('updateStock');
             Route::delete("/delete/{id}", [ProductController::class, 'destroy'])->name('delete');
         });
+    });
+    
+    Route::middleware('IsEmployee')->group(function () {
+        
         Route::prefix('/order')->name('order.')->group(function () {
             Route::get("/cart", [OrderController::class, 'cart'])->name('cart');
             Route::post("/cartPost", [OrderController::class, 'cartPost'])->name('cart.post');
@@ -57,7 +61,15 @@ Route::middleware('IsLogin')->group(function () {
             Route::post("/member/store/{id}", [MemberController::class, 'store'])->name('member.store');
         });
     });
-
+    
+    Route::prefix('/order')->name('order.')->group(function () {
+        Route::get("/", [OrderController::class, 'index'])->name('index');
+        Route::get("/download-pdf/{id}", [OrderController::class, 'downloadPdf'])->name('download.pdf');
+        Route::get("/excel", [OrderController::class, 'exportExcel'])->name('export.excel');
+        Route::get("/excel/month", [OrderController::class, 'exportExcelMonthly'])->name('export.excel.month');
+        Route::get("/excel/year", [OrderController::class, 'exportExcelYear'])->name('export.excel.year');
+    });
+    
     Route::prefix('/product')->name('product.')->group(function () {
         Route::get("/", [ProductController::class, 'index'])->name('index');
     });
@@ -66,11 +78,4 @@ Route::middleware('IsLogin')->group(function () {
         Route::get("/", [UserController::class, 'index'])->name('index');
     });
 
-    Route::prefix('/order')->name('order.')->group(function () {
-        Route::get("/", [OrderController::class, 'index'])->name('index');
-        Route::get("/download-pdf/{id}", [OrderController::class, 'downloadPdf'])->name('download.pdf');
-        Route::get("/excel", [OrderController::class, 'exportExcel'])->name('export.excel');
-        Route::get("/excel/month", [OrderController::class, 'exportExcelMonthly'])->name('export.excel.month');
-        Route::get("/excel/year", [OrderController::class, 'exportExcelYear'])->name('export.excel.year');
-    });
 });

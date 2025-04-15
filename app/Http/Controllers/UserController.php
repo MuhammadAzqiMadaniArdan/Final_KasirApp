@@ -14,34 +14,60 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     //
+
     public function dashboard()
     {
-        $today = Carbon::today();
         $startOfMonth = Carbon::now()->startOfMonth();
         $endOfMonth = Carbon::now()->endOfMonth();
-    
+        // 1. Order hari ini
+        $today = Carbon::today();
         $ordersToday = Order::whereDate('created_at', $today)->count();
-    
-        $ordersDay = Order_detail::whereBetween('created_at', [$startOfMonth, $endOfMonth])
-            ->selectRaw('DATE(created_at) as date, SUM(qty) as total')
-            ->groupBy('date')
-            ->orderBy('date', 'ASC')
-            ->get();
-    
-        $date = $ordersDay->pluck('date')->toArray();
-        $total = $ordersDay->pluck('total')->toArray();
-    
-        $chart = (new LarapexChart)->setTitle('Produk')
-            ->setXAxis($date)
+
+        // $today - Carbon::today();
+        // $ordersToday = Order::whereDate('created_at',$today)->count();
+
+        // 🔹 Penjualan per hari (bar chart)]
+        $dailySales = order_detail::whereBetween('created_at',[$startOfMonth,$endOfMonth])->selectRaw('DATE(created_at) as date,SUM(qty) as total')->groupBy('date')->orderBy('date','ASC')->get();
+
+        $dates = $dailySales->pluck('date')->map(function($date){
+            return Carbon::parse($date)->format('d F Y');
+        })->toArray();
+
+        $totals = $dailySales->pluck('total')->toArray();
+
+        $barChart = (new LarapexChart)->setType('bar')->setTitle('Jumlah Penjualan')->setXAxis($dates)->setDataset([
+            [
+                'name' => 'Jumlah Penjualan',
+                'data' => $totals,
+            ],
+        ])->setColors(['#4f4f']);
+        
+        $barChart = (new LarapexChart)->setType('bar')
+            ->setTitle('Jumlah Penjualan')
+            ->setXAxis($dates)
             ->setDataset([
                 [
-                    "name" => "Produk",
-                    "data" => $total,
-                ]
+                    'name' => 'Jumlah Penjualan',
+                    'data' => $totals,
+                ],
             ])
-            ->setColors(['#FF5733']); // Sesuaikan warna
-    
-        return view('dashboard', compact('ordersToday', 'chart'));
+            ->setColors(['#4FADF7']);
+
+        // 🔹 Pie chart produk terjual
+        $productSales = order_detail::whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->with('product')
+            ->get()
+            ->groupBy('product.name')
+            ->map(function ($items) {
+                return $items->sum('qty');
+            });
+
+        $pieChart = (new LarapexChart)->setType('pie')
+            ->setTitle('Persentase Penjualan Produk')
+            ->setLabels($productSales->keys()->toArray())
+            ->setDataset($productSales->values()->toArray());
+
+        return view('dashboard', compact('barChart', 'pieChart', 'ordersToday'));
     }
     
 

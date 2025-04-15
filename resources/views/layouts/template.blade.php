@@ -117,6 +117,7 @@
                             <ul class="dropdown-menu dropdown-menu-end user-dd animated"
                                 aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="javascript:void(0)"><i class="ti-user m-r-5 m-l-5"></i>
+                                    {{Auth::user()->name}}
                                 </a>
                                 <a class="dropdown-item" href="{{ route('logout') }}"><i
                                         class="mdi mdi-logout
@@ -187,9 +188,9 @@
     <!--This page JavaScript -->
     <!--chartis chart-->
     @stack('script')
-    {{-- <script src="{{ asset('assets/libs/chartist/dist/chartist.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/chartist/dist/chartist.min.js') }}"></script>
     <script src="{{ asset('assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script> --}}
-    {{-- <script src="{{ asset('dist/js/pages/dashboards/dashboard1.js') }}"></script> --}}
+    <script src="{{ asset('dist/js/pages/dashboards/dashboard1.js') }}"></script>
 
 </body>
 

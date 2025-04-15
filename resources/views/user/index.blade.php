@@ -6,7 +6,7 @@
             <div class="col-6">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 d-flex align-items-center">
-                        <li class="breadcrumb-item"><a class="link"><i class="mdi mdi-home-outline fs-4"></i></a></li>
+                        <li class="breadcrumb-item"><a class="link" href="{{route('dashboard')}}"><i class="mdi mdi-home-outline fs-4"></i></a></li>
                         <li class="breadcrumb-item active" aria-current="page">User</li>
                     </ol>
                 </nav>
@@ -14,6 +14,16 @@
             </div>
         </div>
     </div>
+    @if(Session::get('success'))
+    <div class="" style="padding-right: 30px;padding-left: 30px;padding-top: 20px;padding-bottom: 20px;">
+        <p class="btn btn-primary" style="width: 100%;">{{Session::get('success')}}</p>
+    </div>
+    @endif
+    @if(Session::get('failed'))
+    <div class="" style="padding-right: 30px;padding-left: 30px;padding-top: 20px;padding-bottom: 20px;">
+        <p class="btn btn-warning" style="width: 100%;">{{Session::get('failed')}}</p>
+    </div>
+    @endif
 
     <div class="row p-30">
         <div class="col-12">
@@ -21,11 +31,13 @@
                 <div class="card-body">
                     <div class="d-md-flex">
                         <div class="ms-auto">
+                            @if(Auth::user()->role == "Admin")
                             <div class="dl">
                                 <div class="m-r-10"><a class="btn d-flex btn-info text-white"
                                         href="{{ route('user.create') }}">Tambah User</a>
                                 </div>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -51,7 +63,7 @@
                                     <td>{{ $item->email }}</td>
                                     <td>{{ $item->role }}</td>
                                     <td>
-                                        <ul>
+                                        <ul class="d-flex justify-content-around">
                                             <div class="m-r-10">
                                                 <a class="btn btn-info text-white"
                                                     href="{{ route('user.edit', $item->id) }}">Edit</a>
