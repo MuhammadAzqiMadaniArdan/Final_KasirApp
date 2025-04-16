@@ -3,104 +3,167 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Receipt</title>
+  <title>Struk Pembelian</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f8f9fa;
+      padding: 0;
+      margin: 0;
+    }
+  
     .receipt-box {
+      width: 100%;
       max-width: 800px;
       margin: auto;
-      padding: 30px;
-      font-size: 16px;
-      line-height: 24px;
-      color: #333;
-      background: #fff;
-      border: 1px solid #eee;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      background: #ffffff;
+      color: #000;
     }
-    .table thead {
+  
+    .receipt-box h5 {
+      font-size: 20px;
+      font-weight: bold;
+    }
+  
+    .receipt-box p {
+      margin: 4px 0;
+      font-size: 14px;
+    }
+  
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+  
+    .table th,
+    .table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+  
+    .table th {
       background-color: #f2f2f2;
     }
+  
+    .table-summary {
+      margin-top: 10px;
+      font-size: 14px;
+      width: 100%;
+    }
+  
+    .table-summary td {
+      padding: 6px 4px;
+    }
+  
     .footer-text {
       margin-top: 30px;
-      font-size: 14px;
-      color: #888;
+      font-size: 13px;
+      color: #666;
+      text-align: center;
     }
+  
     .thanks {
       font-weight: bold;
-      font-size: 16px;
       text-align: center;
       margin-top: 10px;
+      font-size: 14px;
+    }
+  
+    @media print {
+      body {
+        background: none !important;
+      }
+  
+      .receipt-box {
+        border: none;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+      }
+  
+      @page {
+        size: A4;
+        margin: 20mm;
+      }
+  
+      .table,
+      .table-summary {
+        page-break-inside: avoid;
+      }
     }
   </style>
+  
 </head>
-@php
-$isMember = $order['customer']['status'] == "member" ? true : false;
-;
-@endphp
 <body>
-<div class="receipt-box">
-  <h5 class="fw-bold">Indo April</h5>
-  <p class="mb-1">Member Status :  {{ $isMember ?  $order['customer']['member']['name'] : '-'}}</p>
-  <p class="mb-1">No. HP : {{ $isMember ?  $order['customer']['member']['phone_number'] : '-'}}</p>
-  <p class="mb-1">Bergabung Sejak : {{ $isMember ? \Carbon\Carbon::parse($order['customer']['member']['created_at'])->format('d F Y') : "-"}}</p>
-  <p class="mb-3">Poin Member : {{ $isMember ? $order['customer']['member']['points'] : "-"}}</p>
+@php
+  $isMember = $order['customer']['status'] == "member";
+  $totalPrice = 0;
+@endphp
 
-  <table class="table">
+<div class="receipt-box">
+  <h5>Indo April</h5>
+  <p>Member Status: {{ $isMember ?  $order['customer']['member']['name'] : '-' }}</p>
+  <p>No. HP: {{ $isMember ?  $order['customer']['member']['phone_number'] : '-' }}</p>
+  <p>Bergabung Sejak: {{ $isMember ? \Carbon\Carbon::parse($order['customer']['member']['created_at'])->format('d F Y') : "-" }}</p>
+  <p class="mb-4">Poin Member: {{ $isMember ? $order['customer']['member']['points'] : "-" }}</p>
+
+  <table class="table table-bordered">
     <thead>
       <tr>
         <th>Nama Produk</th>
-        <th>QTY</th>
         <th>Harga</th>
+        <th>QTY</th>
         <th>Sub Total</th>
       </tr>
     </thead>
     <tbody>
-      @php
-      $totalPrice = 0;
-    @endphp
       @foreach ($order['order_details'] as $item)
-      @php
-      $subPrice = $item['product']['price'] * $item['qty'];
-        $totalPrice += $subPrice;
-      @endphp
-      <tr>
-        <td>{{ $item['product']['name'] }}</td>
-        <td>Rp. {{ number_format($item['product']['price'],0,',','.') }}</td>
-        <td>{{ $item['qty'] }}</td>
-        <td>Rp. {{ number_format($subPrice,0,',','.') }}</td>
-      </tr>
+        @php
+          $subPrice = $item['product']['price'] * $item['qty'];
+          $totalPrice += $subPrice;
+        @endphp
+        <tr>
+          <td>{{ $item['product']['name'] }}</td>
+          <td>Rp. {{ number_format($item['product']['price'],0,',','.') }}</td>
+          <td>{{ $item['qty'] }}</td>
+          <td>Rp. {{ number_format($subPrice,0,',','.') }}</td>
+        </tr>
       @endforeach
     </tbody>
   </table>
 
-  <table class="table">
+  <table class="table table-summary w-100">
     <tbody>
       <tr>
         <td class="fw-bold">Total Harga</td>
-        <td class="fw-bold text-end">Rp. {{ $totalPrice }}</td>
+        <td class="text-end fw-bold">Rp. {{ number_format($totalPrice,0,',','.') }}</td>
       </tr>
       <tr>
         <td>Poin Digunakan</td>
-        <td class="text-end">{{ $order['points_used'] }}</td>
+        <td class="text-end">Rp. {{ number_format($order['points_used'],0,',','.') }}</td>
       </tr>
       <tr>
         <td>Harga Setelah Poin</td>
-        <td class="text-end">Rp. {{ $totalPrice - $order['points_used'] }}</td>
+        <td class="text-end">Rp. {{ number_format($totalPrice - $order['points_used'],0,',','.') }}</td>
       </tr>
       <tr>
         <td>Total Kembalian</td>
-        <td class="text-end">Rp. {{ $order['cost'] -  ($totalPrice - $order['points_used']) }}</td>
+        <td class="text-end">Rp. {{ number_format($order['cost'] -  ($totalPrice - $order['points_used']),0,',','.') }}</td>
       </tr>
     </tbody>
   </table>
 
-  <div class="footer-text text-center">
+  <div class="footer-text">
     {{ $order['created_at'] }} | {{ $order['user']['name'] }}
   </div>
-  <div class="thanks text-muted">
+  <div class="thanks">
     Terima kasih atas pembelian Anda!
   </div>
 </div>
-
 </body>
 </html>

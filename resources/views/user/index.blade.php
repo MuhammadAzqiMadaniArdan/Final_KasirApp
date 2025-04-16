@@ -30,7 +30,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-md-flex">
-                        <div class="ms-auto">
+                        <div class="ms-auto d-flex justify-content-between">
                             @if(Auth::user()->role == "Admin")
                             <div class="dl">
                                 <div class="m-r-10"><a class="btn d-flex btn-info text-white"
@@ -38,6 +38,9 @@
                                 </div>
                             </div>
                             @endif
+                            <a class="btn btn-success me-2" style="color: white;" href="{{ route('user.export.excel') }}">
+                                Export Excel
+                            </a>
                         </div>
                     </div>
                 </div>

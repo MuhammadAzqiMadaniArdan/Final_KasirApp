@@ -16,6 +16,7 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping
         $this->type = $type;
         $this->month = $month;
         $this->year = $year;
+
     }
 
     public function collection()
@@ -27,7 +28,7 @@ class OrdersExport implements FromCollection, WithHeadings, WithMapping
         } elseif ($this->type == 'monthly') {
             $query->whereYear('created_at', $this->year)
                   ->whereMonth('created_at', $this->month);
-        } elseif ($this->type == 'yearly') {
+        } elseif ($this->type == 'year') {
             $query->whereYear('created_at', $this->year);
         }
 

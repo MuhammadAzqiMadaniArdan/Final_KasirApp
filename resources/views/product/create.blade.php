@@ -5,7 +5,7 @@
     <div class="page-breadcrumb">
         <div class="row align-items-center">
             <div class="col-6">
-                <nav aria-label="breadcrumb">
+                <nav aria-label="breadcrumb" style="margin-bottom:10px;">
                     <ol class="breadcrumb mb-0 d-flex align-items-center">
                         <li class="breadcrumb-item"><a class="link"><i class="mdi mdi-home-outline fs-4"></i></a></li>
                         <li class="breadcrumb-item active" aria-current="page"><a class="link" href="{{route('product.index')}}">Product</a></li>

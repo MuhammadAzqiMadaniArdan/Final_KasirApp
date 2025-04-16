@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductExport;
+use Excel;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -65,6 +67,12 @@ class ProductController extends Controller
         //
     }
 
+    public function exportProduct()
+    {
+        $file_name = "data pembelian" . ".xslx";
+
+        return Excel::download(new ProductExport, "Product.xlsx");
+    }
     /**
      * Show the form for editing the specified resource.
      */

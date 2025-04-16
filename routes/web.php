@@ -72,10 +72,12 @@ Route::middleware('IsLogin')->group(function () {
     
     Route::prefix('/product')->name('product.')->group(function () {
         Route::get("/", [ProductController::class, 'index'])->name('index');
+        Route::get("/excel", [ProductController::class, 'exportProduct'])->name('export.excel');
     });
-
+    
     Route::prefix('/user')->name('user.')->group(function () {
         Route::get("/", [UserController::class, 'index'])->name('index');
+        Route::get("/excel", [UserController::class, 'exportUser'])->name('export.excel');
     });
 
 });

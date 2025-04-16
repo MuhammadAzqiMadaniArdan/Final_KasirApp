@@ -24,8 +24,8 @@
             <div class="row p-4">
                 @foreach ($products as $index => $item)
                     <div class="col-md-4 mb-4">
-                        <div class="card h-100">
-                            <img src="{{ asset('storage/' . $item->image) }}" class="card-img-top img-fluid" alt="{{ $item->name }}">
+                        <div class="card h-100 d-flex justify-content-center items-content-center" style="text-align: center;">
+                            <img src="{{ asset('storage/' . $item->image) }}" class="card-img-top img-fluid" alt="{{ $item->name }}" width="150">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">{{ $item->name }}</h5>
                                 <p class="card-text mb-1">
@@ -33,7 +33,7 @@
                                     <span class="price" data-raw="{{ $item->price }}">Rp. {{ number_format($item->price, 0, ',', '.') }}</span>
                                 </p>
                                 <p class="card-text mb-2"><strong>Stok:</strong> {{ $item->stock }}</p>
-                                <div class="d-flex align-items-center mb-3">
+                                <div class="d-flex align-items-center mb-3" style="display: flex;justify-content: center;">
                                     <button type="button" class="btn-minus btn btn-info text-white btn-sm me-2">-</button>
                                     <input type="number" name="qty[{{ $index }}]" class="form-control qty text-center" value="{{ $item->qty == 0 ? '0' : '' }}" min="0" max="{{ $item->stock }}" style="width: 60px;">
                                     <button type="button" class="btn-plus btn btn-info text-white btn-sm ms-2">+</button>

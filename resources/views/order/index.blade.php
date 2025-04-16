@@ -44,6 +44,7 @@
                         <form action="{{ route('order.index') }}" method="GET" class="d-flex">
                             <div class="me-2">
                                 <select class="form-select" name="limit" onchange="this.form.submit()">
+                                    <option value="2" {{ $limit == '2' ? 'selected' : '' }}>2</option>
                                     <option value="10" {{ $limit == '10' ? 'selected' : '' }}>10</option>
                                     <option value="25" {{ $limit == '25' ? 'selected' : '' }}>25</option>
                                     <option value="50" {{ $limit == '50' ? 'selected' : '' }}>50</option>

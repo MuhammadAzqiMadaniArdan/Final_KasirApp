@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Exports\UserExport;
 use App\Models\Order_detail;
 use App\Models\User;
 use ArielMejiaDev\LarapexCharts\LarapexChart;
@@ -10,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Excel;
 
 class UserController extends Controller
 {
@@ -78,6 +80,11 @@ class UserController extends Controller
         return view('user.index', compact('users'));
     }
 
+    public function exportUser()
+    {
+
+        return Excel::download(new UserExport, "User.xlsx");
+    }
     /**
      * Show the form for creating a new resource.
      */

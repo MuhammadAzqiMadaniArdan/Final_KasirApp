@@ -4,7 +4,7 @@
     <div class="page-breadcrumb">
         <div class="row align-items-center">
             <div class="col-6">
-                <nav aria-label="breadcrumb">
+                <nav aria-label="breadcrumb p-2">
                     <ol class="breadcrumb mb-0 d-flex align-items-center">
                         <li class="breadcrumb-item"><a class="link"><i class="mdi mdi-home-outline fs-4"></i></a></li>
                         <li class="breadcrumb-item active" aria-current="page">Product</li>
@@ -24,12 +24,12 @@
         <p class="btn btn-warning" style="width: 100%;">{{Session::get('failed')}}</p>
     </div>
     @endif
-    <div class="row p-30">
+    <div class="row p-20">
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
                     <div class="d-md-flex">
-                        <div class="ms-auto">
+                        <div class="ms-auto d-flex justify-content-between">
                             @if(Auth::user()->role == "Admin")
                             <div class="dl">
                                 <div class="m-r-10"><a class="btn d-flex btn-info text-white"
@@ -37,6 +37,9 @@
                                 </div>
                             </div>
                             @endif
+                            <a class="btn btn-success me-2" style="color: white;" href="{{ route('product.export.excel') }}">
+                                Export Excel
+                            </a>
                         </div>
                     </div>
                 </div>
